@@ -17,14 +17,4 @@ async function NyaaSearch(query) {
     const result = await nyaa.search(query, queryOptions);
     return result;
 }
-
-const query = 'Naruto shippuden';
-NyaaSearch(query)
-    .then(result => {
-        console.log('Search Result:', result);
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-
 export { NyaaSearch }
