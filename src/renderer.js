@@ -7,7 +7,7 @@ const loadingElement = document.querySelector('.loader');
 const searchResultsDiv = document.getElementById('search-results');
 const paginationControlsDiv = document.getElementById('pagination-controls');
 const searchInput = document.getElementById('query');
-const matchResults = { "Movie": "Movies", "Game": "Games", };
+const matchResults = { "Movie": "Movies", "Game": "Games" };
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -56,7 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (category && category !== 'All') {
             const mappedCategory = matchResults[category] || category;
             results = searchResults.filter(result =>
-                result.category === mappedCategory || (result.type && result.type === category)
+                (result.category === mappedCategory || (result.type && result.type === category)) ||
+                (result.category === category || (result.type && result.type === mappedCategory))
             );
         } else {
             results = searchResults;
