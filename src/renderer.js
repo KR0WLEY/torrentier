@@ -9,7 +9,6 @@ const paginationControlsDiv = document.getElementById('pagination-controls');
 const searchInput = document.getElementById('query');
 const matchResults = { "Movie": "Movies", "Game": "Games" };
 
-
 document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', function (event) {
         var checkbox = event.target;
@@ -24,13 +23,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    function selectedCheckbox() {
-        let markedCheckbox;
+    function selectedCheckboxes() {
+        const markedCheckboxes = [];
         const checkboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]');
         checkboxes.forEach((checkbox) => {
-            if (checkbox.checked) markedCheckbox = checkbox.value;
+            if (checkbox.checked && checkbox.value !== 'All') markedCheckboxes.push(checkbox.value);
         });
-        return markedCheckbox;
+        return markedCheckboxes;
     }
 
     searchInput.addEventListener('keyup', (event) => {
@@ -41,27 +40,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const query = String(searchInput.value).trim();
             if (query !== '') {
-                const category = selectedCheckbox();
-                ipcRenderer.send('perform-search', { query, category });
+                const categories = selectedCheckboxes();
+                ipcRenderer.send('perform-search', { query, categories });
             }
         }
     });
 
-    ipcRenderer.on('update-search-results', (event, { searchResults, category }) => {
+    ipcRenderer.on('update-search-results', (event, { searchResults, categories }) => {
         clearResultsAndPagination();
 
-        console.log('Selected Category:', category);
+        console.log('Selected Categories:', categories);
         console.log('Search Results:', searchResults);
 
-        if (category && category !== 'All') {
-            const mappedCategory = matchResults[category] || category;
-            results = searchResults.filter(result =>
-                (result.category === mappedCategory || (result.type && result.type === category)) ||
-                (result.category === category || (result.type && result.type === mappedCategory))
-            );
+        if (categories && categories.length > 0) {
+            results = searchResults.filter(result => {
+                return categories.some(category => {
+                    const mappedCategory = matchResults[category] || category;
+                    return (result.category === mappedCategory || result.type === category) || (result.category === category || result.type === mappedCategory);
+                });
+            });
         } else {
             results = searchResults;
         }
+
         results.sort((a, b) => (b.seeders || b.seeds || 0) - (a.seeders || a.seeds || 0));
 
         console.log('Filtered and Sorted Results:', results);
