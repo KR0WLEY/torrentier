@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (results.length === 0) {
             loadingElement.style.display = 'none';
-            displayNoResults();
+            searchResultsDiv.innerHTML = '<div class="no-results">No results found</div>';
         } else {
             totalPages = Math.ceil(results.length / RESULTS_PER_PAGE);
             loadingElement.style.display = 'none';
@@ -116,10 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 searchResultsDiv.appendChild(resultItem);
             }
         }
-    }
-
-    function displayNoResults() {
-        searchResultsDiv.innerHTML = '<div class="no-results">No results found</div>';
     }
 
     function addButton(text, page, className = '') {
