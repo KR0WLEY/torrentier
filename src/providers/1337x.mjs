@@ -62,22 +62,4 @@ async function scrape1337x(query, pages = 1) {
 
     return allTorrents;
 }
-/*
-const query = 'Deadpool';
-
-scrape1337x(query, 2).then(torrents => {
-    torrents = torrents.filter(t => t.category === 'Movie')
-
-    torrents.forEach(torrent => {
-        console.log(`Title: ${torrent.title}`);
-        console.log(`Magnet URL: ${torrent.magnetURL}`);
-        console.log(`Seeds: ${torrent.seeds}`);
-        console.log(`Leeches: ${torrent.leeches}`);
-        console.log(`Upload Date: ${torrent.uploadDate}`);
-        console.log(`Size: ${torrent.size}`);
-        console.log(`Category: ${torrent.category}`);
-        console.log('---------------------------');
-    });
-});
-*/
 export { scrape1337x }
