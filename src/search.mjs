@@ -1,13 +1,17 @@
 import { scrape1337x } from './providers/1337x.mjs';
 import { magnetDLSearch } from './providers/magnetDL.mjs';
 
-async function combinedSearch(query, categories, pages = 1) {
+async function combinedSearch(query, categories) {
     console.log('Performing combined search with query: ', query);
     try {
         const promises = [];
 
-        promises.push(scrape1337x(query, pages));
-        promises.push(magnetDLSearch(query, pages));
+        if (categories && categories.length > 0) {
+            promises.push(scrape1337x(query, categories));
+        } else {
+            promises.push(scrape1337x(query, ['Movies', 'Games', 'Animes', 'TV']));
+        }
+        promises.push(magnetDLSearch(query));
 
         const results = await Promise.all(promises);
 
