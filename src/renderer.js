@@ -1,13 +1,13 @@
 const { ipcRenderer, shell } = require('electron');
-const RESULTS_PER_PAGE = 12;
-let currentPage = 1;
-let totalPages = 1;
-let results = [];
 const loadingElement = document.querySelector('.loader');
 const searchResultsDiv = document.getElementById('search-results');
 const paginationControlsDiv = document.getElementById('pagination-controls');
 const searchInput = document.getElementById('query');
 const matchResults = { "Movie": "Movies", "Game": "Games" };
+const RESULTS_PER_PAGE = 10;
+let currentPage = 1;
+let totalPages = 1;
+let results = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', function (event) {
@@ -27,9 +27,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const markedCheckboxes = [];
         const checkboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]');
         checkboxes.forEach((checkbox) => {
-            if (checkbox.checked && checkbox.value !== 'All') markedCheckboxes.push(checkbox.value);
+            if (checkbox.checked) markedCheckboxes.push(checkbox.value);
         });
         return markedCheckboxes;
+    }
+
+    function clearResultsAndPagination() {
+        searchResultsDiv.innerHTML = '';
+        paginationControlsDiv.innerHTML = '';
     }
 
     searchInput.addEventListener('keyup', (event) => {
@@ -52,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Selected Categories:', categories);
         console.log('Search Results:', searchResults);
 
-        if (categories && categories.length > 0) {
+        if (categories && categories.length > 0 && !categories.includes('All')) {
             results = searchResults.filter(result => {
                 return categories.some(category => {
                     const mappedCategory = matchResults[category] || category;
@@ -146,10 +151,5 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentPage < totalPages) {
             addButton('Next', currentPage + 1);
         }
-    }
-
-    function clearResultsAndPagination() {
-        searchResultsDiv.innerHTML = '';
-        paginationControlsDiv.innerHTML = '';
     }
 });
