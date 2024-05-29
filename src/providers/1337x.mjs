@@ -6,7 +6,7 @@ async function fetchPage(url) {
         const response = await axios.get(url);
         return response.data;
     } catch (error) {
-        console.error(`Error fetching the URL: ${url}`);
+        console.error(`Error fetching ${url}`);
         return null;
     }
 }
@@ -23,14 +23,7 @@ function parseMainPageHTML(html) {
         const leeches = $(element).find('.coll-3.leeches').text();
         const uploadDate = $(element).find('.coll-date').text();
         const size = $(element).find('.coll-4.size').text();
-        torrents.push({
-            title,
-            link: `https://www.1377x.to${link}`,
-            seeds,
-            leeches,
-            uploadDate,
-            size
-        });
+        torrents.push({ title, link: `https://www.1377x.to${link}`, seeds, leeches, uploadDate, size });
     });
     return torrents;
 }
@@ -41,10 +34,7 @@ async function fetchMagnetURL(torrentPageURL) {
         const $ = cheerio.load(html);
         const magnetURL = $('a[href^="magnet:"]').attr('href');
         const category = $('ul.list li:contains("Category") span').text();
-        return {
-            magnetURL,
-            category
-        };
+        return { magnetURL, category };
     }
     return null;
 }
@@ -73,9 +63,14 @@ async function scrape1337x(query, categories, pages = 1) {
                 const magnetResults = await Promise.all(magnetPromises);
 
                 for (let i = 0; i < torrents.length; i++) {
-                    const { magnetURL, category } = magnetResults[i];
-                    torrents[i].magnetURL = magnetURL;
-                    torrents[i].category = category;
+                    const result = magnetResults[i];
+                    if (result) {
+                        const { magnetURL, category } = result;
+                        torrents[i].magnetURL = magnetURL;
+                        torrents[i].category = category;
+                    } else {
+                        console.warn(`No magnet URL found for torrent: ${torrents[i].title}`);
+                    }
                 }
                 allTorrents = allTorrents.concat(torrents);
             }
@@ -94,9 +89,14 @@ async function scrape1337x(query, categories, pages = 1) {
                     const magnetPromises = torrents.map((torrent) => fetchMagnetURL(torrent.link));
                     const magnetResults = await Promise.all(magnetPromises);
                     for (let i = 0; i < torrents.length; i++) {
-                        const { magnetURL, category } = magnetResults[i];
-                        torrents[i].magnetURL = magnetURL;
-                        torrents[i].category = category;
+                        const result = magnetResults[i];
+                        if (result) {
+                            const { magnetURL, category } = result;
+                            torrents[i].magnetURL = magnetURL;
+                            torrents[i].category = category;
+                        } else {
+                            console.warn(`No magnet URL found for ${torrents[i].title}`);
+                        }
                     }
                     allTorrents = allTorrents.concat(torrents);
                 }
