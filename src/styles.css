@@ -204,7 +204,7 @@ body {
 }
 .loader-container {
     position: relative;
-    margin-top: 20px; /* Adjust this value as needed */
+    margin-top: 20px;
 }
 
 .loader {
