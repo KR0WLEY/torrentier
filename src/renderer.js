@@ -3,8 +3,8 @@ const loadingElement = document.querySelector('.loader');
 const searchResultsDiv = document.getElementById('search-results');
 const paginationControlsDiv = document.getElementById('pagination-controls');
 const searchInput = document.getElementById('query');
-const matchResults = { "Movie": "Movies", "Game": "Games" };
-const RESULTS_PER_PAGE = 10;
+const matchResults = { "Movie": "Movies", "Game": "Games", "Anime": "Animes", "TV": "TV Shows" };
+const RESULTS_PER_PAGE = 12;
 let currentPage = 1;
 let totalPages = 1;
 let results = [];
@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         checkboxes.forEach((checkbox) => {
             if (checkbox.checked) markedCheckboxes.push(checkbox.value);
         });
+        console.log('Selected Categories:', markedCheckboxes);
         return markedCheckboxes;
     }
 
@@ -54,27 +55,27 @@ document.addEventListener('DOMContentLoaded', () => {
     ipcRenderer.on('update-search-results', (event, { searchResults, categories }) => {
         clearResultsAndPagination();
 
-        console.log('Selected Categories:', categories);
-        console.log('Search Results:', searchResults);
+        console.log('Received Categories:', categories);
+        console.log('Received Search Results:', searchResults);
 
         if (categories && categories.length > 0 && !categories.includes('All')) {
-            results = searchResults.filter(result => {
+            searchResults = searchResults.filter(result => {
                 return categories.some(category => {
                     const mappedCategory = matchResults[category] || category;
                     return (result.category === mappedCategory || result.type === category) || (result.category === category || result.type === mappedCategory);
                 });
             });
-        } else {
-            results = searchResults;
         }
 
-        results.sort((a, b) => (b.seeders || b.seeds || 0) - (a.seeders || a.seeds || 0));
+        results = searchResults.filter(result => result.seeders > 0);
+
+        results.sort((a, b) => (b.seeders || 0) - (a.seeders || 0));
 
         console.log('Filtered and Sorted Results:', results);
 
         if (results.length === 0) {
             loadingElement.style.display = 'none';
-            searchResultsDiv.innerHTML = '<div class="no-results">No results found</div>';
+            searchResultsDiv.innerHTML = '<div class="no-results">No results found.</div>';
         } else {
             totalPages = Math.ceil(results.length / RESULTS_PER_PAGE);
             loadingElement.style.display = 'none';
@@ -107,7 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
                 const seedersSpan = document.createElement('span');
-                seedersSpan.textContent = ` | Seeders: ${result.seeders || result.seeds}`;
+                seedersSpan.textContent = ` | Seeders: ${result.seeders}`;
                 seedersSpan.classList.add('result-seeders');
 
                 const sizeSpan = document.createElement('span');
