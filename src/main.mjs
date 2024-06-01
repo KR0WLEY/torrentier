@@ -17,7 +17,7 @@ function createWindow() {
             nodeIntegration: true,
             contextIsolation: false,
             sandbox: false,
-            devTools: true,
+            devTools: false,
         }
     })
 
