@@ -55,9 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
     ipcRenderer.on('update-search-results', (event, { searchResults, categories }) => {
         clearResultsAndPagination();
 
-        console.log('Received Categories:', categories);
-        console.log('Received Search Results:', searchResults);
-
         if (categories && categories.length > 0 && !categories.includes('All')) {
             searchResults = searchResults.filter(result => {
                 return categories.some(category => {
@@ -70,8 +67,6 @@ document.addEventListener('DOMContentLoaded', () => {
         results = searchResults.filter(result => result.seeders > 0);
 
         results.sort((a, b) => (b.seeders || 0) - (a.seeders || 0));
-
-        console.log('Filtered and Sorted Results:', results);
 
         if (results.length === 0) {
             loadingElement.style.display = 'none';
