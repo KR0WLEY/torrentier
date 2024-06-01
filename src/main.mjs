@@ -4,7 +4,6 @@ import { fileURLToPath } from 'url';
 import path from 'path'
 
 let mainWindow;
-
 function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1200,
@@ -13,7 +12,7 @@ function createWindow() {
         backgroundColor: '#212121',
         fullscreenable: true,
         resizable: false,
-        maximizable: true,
+        maximizable: false,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
@@ -27,16 +26,15 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-
-    createWindow()
+    createWindow();
 })
 
 ipcMain.on('perform-search', async (event, { query, categories }) => {
     console.log('Received search query:', query);
     try {
-        const searchResults = await combinedSearch(query);
+        const searchResults = await combinedSearch(query, categories);
         event.sender.send('update-search-results', { searchResults, categories });
     } catch (error) {
-        console.error('Error performing search:', error);
+        console.error('Error performing search', error);
     }
 });
